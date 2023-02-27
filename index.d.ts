@@ -1206,13 +1206,19 @@ export namespace Temporal {
     readonly [Symbol.toStringTag]: 'Temporal.PlainYearMonth';
   }
 
-  export type ZonedDateTimeLike = {
+  type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
+    Pick<T, Exclude<keyof T, Keys>>
+    & {
+      [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
+    }[Keys]
+
+  type ZonedDateTimeLikeInternal = {
     era?: string | undefined;
     eraYear?: number | undefined;
-    year?: number;
+    year: number;
     month?: number;
     monthCode?: string;
-    day?: number;
+    day: number;
     hour?: number;
     minute?: number;
     second?: number;
@@ -1223,6 +1229,8 @@ export namespace Temporal {
     timeZone?: TimeZoneLike;
     calendar?: CalendarLike;
   };
+
+  export type ZonedDateTimeLike = RequireAtLeastOne<ZonedDateTimeLikeInternal, 'month' | 'monthCode'>
 
   type ZonedDateTimeISOFields = {
     isoYear: number;
